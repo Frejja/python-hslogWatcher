@@ -24,10 +24,9 @@ def ignore_errors(src, names):
     for name in names:
         try:
             os.lstat(os.path.join(src, name))  # lstat to not follow symlinks
-        except OSError as err:
-            if err.errno == errno.EACCES:
-                continue
-            errors.append(name)
+        except os.error as err:
+            if err.errno != errno.EACCES:
+                errors.append(name)
     return errors
 
 # Copy all files from source_directory to directory
@@ -40,6 +39,7 @@ files = os.listdir(directory)
 for file in files:
     # Construct full path
     full_path = os.path.join(directory, file)
+    file_in_archive = file 
     # Feed the full path to magic.from_file()
     file_type = magic.from_file(full_path)
 
