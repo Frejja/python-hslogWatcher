@@ -21,10 +21,15 @@ for filename in os.listdir(directory):
         print(f'Failed to delete {file_path}. Reason: {e}')
 
 # Function to ignore 'Permission denied' errors while copying
-def ignore_errors(func, path, exc_info):
-    if exc_info[1].errno == errno.EACCES:
-        return
-    raise
+def ignore_errors(src, names):
+    errors = []
+    for name in names:
+        try:
+            os.lstat(os.path.join(src, name))  # lstat to not follow symlinks
+        except os.error as err:
+            if err.errno != errno.EACCES:
+                errors.append(name)
+    return errors
 
 # Copy all files from source_directory to directory
 shutil.copytree(source_directory, directory, dirs_exist_ok=True, ignore=ignore_errors)
