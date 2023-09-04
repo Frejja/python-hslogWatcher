@@ -6,7 +6,7 @@ import gzip
 import tarfile
 
 source_directory = r"C:\Users\Mikael\AppData\Local\Overwolf\BrowserCache\Cache\Cache_Data"
-directory = "C:\Users\Mikael\AppData\Local\Overwolf\BrowserCache\Cache\Cache_Data_temp"
+directory = r"C:\Users\Mikael\AppData\Local\Overwolf\BrowserCache\Cache\Cache_Data_temp"
 temp_directory = r"h:\dev\temp"
 
 # Delete all files in the directory
