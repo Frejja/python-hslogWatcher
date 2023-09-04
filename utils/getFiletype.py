@@ -4,7 +4,7 @@ import shutil
 import errno
 import gzip
 import tarfile
-import zipfile
+
 source_directory = r"C:\Users\Mikael\AppData\Local\Overwolf\BrowserCache\Cache\Cache_Data"
 directory = r"C:\Users\Mikael\AppData\Local\Overwolf\BrowserCache\Cache\Cache_Data_temp"
 temp_directory = r"h:\dev\temp"
@@ -26,9 +26,10 @@ def ignore_errors(src, names):
     for name in names:
         try:
             os.lstat(os.path.join(src, name))  # lstat to not follow symlinks
-        except os.error as err:
-            if err.errno != errno.EACCES:
-                errors.append(name)
+        except OSError as err:
+            if err.errno == errno.EACCES:
+                continue
+            errors.append(name)
     return errors
 
 # Copy all files from source_directory to directory
@@ -41,25 +42,19 @@ files = os.listdir(directory)
 for file in files:
     # Construct full path
     full_path = os.path.join(directory, file)
-    file_in_archive = file 
     # Feed the full path to magic.from_file()
     file_type = magic.from_file(full_path)
     # Check if the file type is "gzip compressed data"
-#    print(file_type)
-    if "Zip archive data, at least v1.0 to extract" in file_type:
-
+    if "gzip compressed data" in file_type:
         # Open the gzip file
-        try:    
-            with zipfile.ZipFile(full_path) as f:
-               file_list = f.namelist()
-               for file in file_list:
-                     if file == "replay.xml":
-                        print(f"File: {file}, Type: {file_type}")
-                        # Rename the file to have the extension .zip
-                        destination_path = os.path.join(temp_directory, f"{os.path.splitext(file_in_archive)[0]}.zip")
-                        #os.rename(full_path, os.path.join(directory, new_file_name))
-                        # Move the file to temp_directory
-                        shutil.copyfile(full_path, destination_path)
-                        #shutil.move(os.path.join(directory, file), os.path.join(temp_directory, file))
-        except:
-            pass
+        with gzip.open(full_path, 'rb') as f:
+            # Open the tar file
+            with tarfile.open(fileobj=f) as tar:
+                # Check if "replay.xml" is in the tar file
+                if any(name.endswith("replay.xml") for name in tar.getnames()):
+                    print(f"File: {file}, Type: {file_type}")
+                    # Rename the file to have the extension .zip
+                    new_file_name = f"{os.path.splitext(file)[0]}.zip"
+                    os.rename(full_path, os.path.join(directory, new_file_name))
+                    # Move the file to temp_directory
+                    shutil.move(os.path.join(directory, new_file_name), os.path.join(temp_directory, new_file_name))
