@@ -2,8 +2,6 @@ import magic
 import os
 import shutil
 import errno
-import gzip
-import tarfile
 import zipfile
 source_directory = r"C:\Users\Mikael\AppData\Local\Overwolf\BrowserCache\Cache\Cache_Data"
 directory = r"C:\Users\Mikael\AppData\Local\Overwolf\BrowserCache\Cache\Cache_Data_temp"
@@ -44,8 +42,7 @@ for file in files:
     file_in_archive = file 
     # Feed the full path to magic.from_file()
     file_type = magic.from_file(full_path)
-    # Check if the file type is "gzip compressed data"
-#    print(file_type)
+
     if "Zip archive data, at least v1.0 to extract" in file_type:
 
         # Open the gzip file
@@ -57,9 +54,8 @@ for file in files:
                         print(f"File: {file}, Type: {file_type}")
                         # Rename the file to have the extension .zip
                         destination_path = os.path.join(temp_directory, f"{os.path.splitext(file_in_archive)[0]}.zip")
-                        #os.rename(full_path, os.path.join(directory, new_file_name))
-                        # Move the file to temp_directory
+                        # Copy the file to temp_directory
                         shutil.copyfile(full_path, destination_path)
-                        #shutil.move(os.path.join(directory, file), os.path.join(temp_directory, file))
+                       
         except:
             pass
