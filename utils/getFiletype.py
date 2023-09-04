@@ -2,7 +2,7 @@ import magic
 import os
 import shutil
 
-directory = "C:\Users\Mikael\AppData\Local\Overwolf\BrowserCache\Cache\Cache_Data_temp"
+directory = r"C:\Users\Mikael\AppData\Local\Overwolf\BrowserCache\Cache\Cache_Data_temp"
 temp_directory = r"h:\dev\temp"
 
 # Get list of all files in the directory
